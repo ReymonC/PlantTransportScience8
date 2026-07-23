@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science 8: Plant Transport Systems Reviewer</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #e8f5e9;
+            --secondary: #81c784;
+            --correct: #2e7d32;
+            --incorrect: #c62828;
+            --text: #333333;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .quiz-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 680px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 1.35rem;
+            color: var(--primary);
+        }
+
+        .badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 25px 0 20px 0;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 0.98rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text);
+            outline: none;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--secondary);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn.correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24 !important;
+        }
+
+        .rationale-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .rationale-box.correct-bg {
+            background-color: #e8f5e9;
+            border-left: 5px solid var(--correct);
+            color: #1b5e20;
+        }
+
+        .rationale-box.incorrect-bg {
+            background-color: #ffebee;
+            border-left: 5px solid var(--incorrect);
+            color: #b71c1c;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s;
+        }
+
+        .next-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        .completion-screen {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        .completion-screen h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .completion-screen p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .restart-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <!-- Active Quiz View -->
+    <div id="quiz-view">
+        <div class="header">
+            <div class="title-bar">
+                <h1>Science 8 Reviewer</h1>
+                <span class="badge" id="queue-count">Remaining: 15</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="question-text" id="question-text">Loading question...</div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Options will be injected here -->
+        </div>
+
+        <div class="rationale-box" id="rationale-box">
+            <strong id="rationale-title">Rationale:</strong>
+            <p id="rationale-text"></p>
+        </div>
+
+        <div class="controls">
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Completion Screen -->
+    <div class="completion-screen" id="completion-screen">
+        <h2>🎉 True Mastery Achieved! 🎉</h2>
+        <p>You have demonstrated genuine conceptual understanding of Plant Transport Systems!</p>
+        <button class="restart-btn" onclick="restartQuiz()">Review Again</button>
+    </div>
+</div>
+
+<script>
+    // Length-Balanced Master Question Pool
+    const rawQuestions = [
+        {
+            question: "Which part of the plant primarily absorbs water and minerals from the soil?",
+            correct: "Roots",
+            incorrect: ["Leaves", "Stems", "Flowers"],
+            rationale: "Roots grow underground and feature microscopic root hairs that maximize surface area to absorb water and dissolved inorganic minerals from the soil."
+        },
+        {
+            question: "Which structure on the leaf surface regulates gas exchange and water loss?",
+            correct: "Stomata",
+            incorrect: ["Cuticle", "Mesophyll", "Chloroplasts"],
+            rationale: "Stomata are specialized microscopic pores flanked by guard cells that open and close to control gas exchange (CO₂ and O₂) and regulate water vapor loss."
+        },
+        {
+            question: "Which plant structure supports the leaves and transports materials between roots and leaves?",
+            correct: "Stem",
+            incorrect: ["Leaf", "Root", "Flower"],
+            rationale: "The stem provides physical support to hold leaves up to sunlight and contains vascular bundles (xylem and phloem) that route fluids back and forth between roots and leaves."
+        },
+        {
+            question: "Which plant organ contains the vascular tissues that connect roots, stems, leaves, and flowers?",
+            correct: "Stem",
+            incorrect: ["Leaf", "Root", "Seed"],
+            rationale: "The stem acts as the central structural highway housing continuous vascular bundles that connect the lower underground roots to upper leaves, flowers, and fruits."
+        },
+        {
+            question: "Which process causes water to evaporate from the leaf surface, creating a pull that moves water upward?",
+            correct: "Transpiration",
+            incorrect: ["Photosynthesis", "Respiration", "Translocation"],
+            rationale: "Transpiration is the evaporation of water vapor through stomata. This creates a negative pressure (tension) at the top of the plant that pulls water up from the roots."
+        },
+        {
+            question: "What is the primary function of xylem in the plant transport system?",
+            correct: "Transports water and soil minerals upward from roots to leaves",
+            incorrect: [
+                "Transports sugars and organic food downward from leaves to roots",
+                "Absorbs carbon dioxide gas and light directly from surrounding air",
+                "Converts dissolved soil nitrogen into oxygen gas for respiration"
+            ],
+            rationale: "Xylem consists of specialized dead, vessel-like tissues that carry water and essential minerals unidirectionally from roots to all upper plant structures."
+        },
+        {
+            question: "What is the main role of phloem in the plant transport system?",
+            correct: "Distributes dissolved sugars and photosynthetic food throughout the plant body",
+            incorrect: [
+                "Pulls liquid groundwater and inorganic soil minerals upward toward leaves",
+                "Stores oxygen and carbon dioxide gases inside hollow stem cells",
+                "Anchors underground roots firmly into deep soil and gravel layers"
+            ],
+            rationale: "Phloem consists of living cells (sieve tubes) that distribute dissolved sugars made during photosynthesis in leaves to growing shoots, fruits, and underground roots."
+        },
+        {
+            question: "Which condition would most likely reduce the rate of water movement through the xylem?",
+            correct: "High atmospheric humidity in surrounding air",
+            incorrect: [
+                "Direct exposure to warm and intense midday sunlight",
+                "Increase in wind speed across surrounding leaf surfaces",
+                "High concentrations of dissolved liquid moisture in soil"
+            ],
+            rationale: "High air humidity decreases the evaporation gradient between the inside of the leaf and the outside air. Lower evaporation slows down transpiration and xylem flow."
+        },
+        {
+            question: "What force is primarily responsible for pulling water upward through xylem vessels?",
+            correct: "Transpirational pull assisted by cohesion and adhesion forces",
+            incorrect: [
+                "Active muscular contraction within surrounding live stem tissues",
+                "Gravitational pull forcing fluid upward through hollow plant tubes",
+                "Atmospheric pressure pushing down on upper leaf open stomata"
+            ],
+            rationale: "As transpiration pulls water out of leaves, cohesion (water sticking to water) and adhesion (water sticking to xylem walls) draw an unbroken water column upward."
+        },
+        {
+            question: "What is the most likely effect if the xylem vessels become blocked?",
+            correct: "Leaves wilt and dry out from lack of hydration",
+            incorrect: [
+                "Leaves expand in size and produce excess photosynthetic glucose sugars",
+                "Roots immediately absorb double the normal volume of soil minerals",
+                "Stomata open wider to pull carbon dioxide gas into stems"
+            ],
+            rationale: "Xylem delivers essential hydration required to maintain cell turgor pressure and perform photosynthesis. Blocking xylem causes leaves to lose firmness, wilt, and dry out."
+        },
+        {
+            question: "Why does water transport through the xylem become less efficient during a drought?",
+            correct: "Stomata close to prevent moisture loss, stopping transpirational suction",
+            incorrect: [
+                "Phloem vessels expand rapidly and physically crush nearby xylem tubes",
+                "Root hairs detach from stems to store extra water underground",
+                "Chloroplasts consume xylem liquid to protect leaves from solar radiation"
+            ],
+            rationale: "To prevent severe dehydration during drought, plants close their stomata. However, closing stomata stops transpiration, eliminating the main pull that drives xylem transport."
+        },
+        {
+            question: "A plant has healthy roots but damaged phloem tissue. Which problem is the plant most likely to experience?",
+            correct: "Roots starve because leaf sugars cannot move downward",
+            incorrect: [
+                "Leaves dry out because root water cannot move upward",
+                "Stomata close permanently and prevent all leaf gas exchange",
+                "Roots absorb excessive amounts of toxic soil mineral salts"
+            ],
+            rationale: "Roots cannot perform photosynthesis because they are underground in the dark. If phloem is damaged, sugars synthesized in leaves cannot travel down, causing roots to starve."
+        },
+        {
+            question: "How are xylem and phloem typically arranged within a vascular bundle?",
+            correct: "Side-by-side, with xylem facing inside and phloem facing outside",
+            incorrect: [
+                "In separate organs, with xylem in roots and phloem in leaves",
+                "Alternating in random individual cells throughout central leaf mesophyll",
+                "Concentric complete rings, with phloem entirely sealed inside xylem"
+            ],
+            rationale: "In stem vascular bundles, xylem and phloem run side-by-side as distinct tissues, with xylem located toward the inner interior and phloem toward the outer tissue layers."
+        },
+        {
+            question: "Why is the plant transport system essential for the survival of multicellular plants?",
+            correct: "It distributes essential water, minerals, and food between distant specialized organs",
+            incorrect: [
+                "It allows green plants to physically move their root systems toward richer soil",
+                "It converts harmful environmental solar radiation into protective structural bark and wood",
+                "It prevents plant-eating animals and insects from digesting internal leaf and stem tissues"
+            ],
+            rationale: "Multicellular plants have specialized organs far apart (roots underground, leaves in the air). The transport system bridges this gap to ensure every cell stays hydrated and nourished."
+        },
+        {
+            question: "How does the plant transport system help plants survive changing environmental conditions, such as drought or high temperatures?",
+            correct: "It regulates fluid flow and works with guard cells to control water loss",
+            incorrect: [
+                "It signals roots to disconnect from stem tissues until dry weather passes completely",
+                "It converts liquid water into solid plant starch to prevent high-temperature evaporation loss",
+                "It causes leaves to drop their cell walls so water can flow freely outside"
+            ],
+            rationale: "The transport system coordinates with stomata and guard cells to regulate water movement, adjust sap tension, and balance hydration based on environmental temperatures and soil moisture."
+        }
+    ];
+
+    // Quiz State Variables
+    let activeQueue = [];
+    let initialTotal = 0;
+    let currentQuestion = null;
+
+    // Helper: Shuffle Array (Fisher-Yates)
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        const newArray = [...array];
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]];
+        }
+        return newArray;
+    }
+
+    function initQuiz() {
+        activeQueue = Array.from({ length: rawQuestions.length }, (_, i) => i);
+        activeQueue = shuffle(activeQueue);
+        initialTotal = rawQuestions.length;
+        
+        document.getElementById("quiz-view").style.display = "block";
+        document.getElementById("completion-screen").style.display = "none";
+        
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        document.getElementById("next-btn").style.display = "none";
+        const rationaleBox = document.getElementById("rationale-box");
+        rationaleBox.style.display = "none";
+        rationaleBox.className = "rationale-box";
+
+        const remaining = activeQueue.length;
+        const cleared = initialTotal - remaining;
+        const progressPercent = (cleared / initialTotal) * 100;
+
+        document.getElementById("queue-count").textContent = `Remaining: ${remaining}`;
+        document.getElementById("progress-bar").style.width = `${progressPercent}%`;
+
+        if (remaining === 0) {
+            showCompletionScreen();
+            return;
+        }
+
+        const questionIndex = activeQueue[0];
+        currentQuestion = rawQuestions[questionIndex];
+
+        document.getElementById("question-text").textContent = currentQuestion.question;
+
+        const choices = [
+            { text: currentQuestion.correct, isCorrect: true },
+            ...currentQuestion.incorrect.map(text => ({ text, isCorrect: false }))
+        ];
+
+        // Randomize choice positions
+        const randomizedChoices = shuffle(choices);
+
+        const container = document.getElementById("options-container");
+        container.innerHTML = "";
+
+        randomizedChoices.forEach(choice => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.textContent = choice.text;
+            btn.onclick = () => handleAnswer(choice, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(selectedChoice, selectedBtn) {
+        const buttons = document.querySelectorAll(".option-btn");
+        buttons.forEach(btn => btn.disabled = true);
+
+        const rationaleBox = document.getElementById("rationale-box");
+        const rationaleTitle = document.getElementById("rationale-title");
+        const rationaleText = document.getElementById("rationale-text");
+
+        if (selectedChoice.isCorrect) {
+            selectedBtn.classList.add("correct");
+            
+            rationaleTitle.textContent = "Correct! Great understanding!";
+            rationaleText.textContent = currentQuestion.rationale;
+            rationaleBox.className = "rationale-box correct-bg";
+            
+            activeQueue.shift();
+        } else {
+            selectedBtn.classList.add("incorrect");
+            
+            buttons.forEach(btn => {
+                if (btn.textContent === currentQuestion.correct) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            rationaleTitle.textContent = "Incorrect. Here is why:";
+            rationaleText.textContent = `${currentQuestion.rationale} (This question will return later in your queue for review.)`;
+            rationaleBox.className = "rationale-box incorrect-bg";
+
+            const missedQuestion = activeQueue.shift();
+            activeQueue.push(missedQuestion);
+        }
+
+        rationaleBox.style.display = "block";
+        document.getElementById("next-btn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        renderQuestion();
+    }
+
+    function showCompletionScreen() {
+        document.getElementById("quiz-view").style.display = "none";
+        document.getElementById("completion-screen").style.display = "block";
+    }
+
+    function restartQuiz() {
+        initQuiz();
+    }
+
+    window.onload = initQuiz;
+</script>
+
+</body>
+</html>
